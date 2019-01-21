@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>选字游戏练习</title>
+    <style>
+        .wrap {
+            width: 400px;
+            border: 1px solid red;
+            margin: 50px auto;
+            padding: 10px;
+            position: relative;
+        }
+
+        .top {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .bigtext {
+            text-align: center;
+            line-height: 400px;
+            font-size: 15rem;
+        }
+
+        .smalltext {
+            display: flex;
+            justify-content: space-around;
+            font-size: 50px;
+            line-height: 60px;
+        }
+
+        .smalltext span {
+            cursor: pointer;
+        }
+        .mask{
+            background: rgba(170, 168, 168, 0.418);
+            position: absolute;
+            top:0;
+            bottom:0;
+            left:0;
+            right:0;
+        }
+        .start,.ends{
+            width:40%;
+            background:skyblue;
+            color:white;
+            font-size:2rem;
+            margin:20% auto;
+            text-align:center;
+            padding:5px 0;
+            border-radius: 5px;
+            cursor:pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="top">
+            <div class="time">倒计时:60S</div>
+            <div class="score">积分:0</div>
+        </div>
+        <!-- 大字 -->
+        <div class="bigtext">蓝</div>
+        <!-- 小字 -->
+        <div class="smalltext">
+            <span class="">红</span>
+            <span class="">黄</span>
+            <span class="">蓝</span>
+            <span class="">绿</span>
+            <span class="">黑</span>
+        </div>
+        <div class="mask" style="display:none">
+            <p class="start">重新开始</p>
+            <p class="ends">退出</p>
+        </div>
+    </div>
+
+    <script>
+        var timeEle = document.querySelector('.time');
+        var score = document.querySelector('.score');
+        var bigEle = document.querySelector('.bigtext');
+        var smallEle = document.querySelectorAll('.smalltext span');
+        var textArr = ['红', '黄', '蓝', '绿', '黑'];
+        var colorArr = ['red', 'yellow', 'blue', 'green', 'black'];
+        var mask = document.getElementsByClassName('mask')[0];
+        var start = document.getElementsByClassName('start')[0];
+        var ends = document.getElementsByClassName('ends')[0];
+        var sore = 0;
+        var time = 60;//时间从100开始
+        // 封装一个随机函数
+        function getRandom(min, max) {
+            return Math.round(Math.random() * (max - min) + min);
+        }
+        // 封装一个个随机数组,并且数组中没有随机颜色
+        function randArr() {
+            var arr = [];
+            while (arr.length < 5) {
+                var num = getRandom(0, 4);
+                if (arr.indexOf(num) < 0) {//去掉重复的内容
+                    arr.push(num);
+                }
+            }
+            return arr;
+        }
+        // 随机文本内容和颜色
+        function changeText() {
+            // 随机大字的文本和颜色
+            var bigText = getRandom(0, 4);
+            var bigColor = getRandom(0, 4);
+            bigEle.innerHTML = textArr[bigText];//输出大字的内容
+            bigEle.style.color = colorArr[bigColor];
+            bigEle.index = bigColor;
+            // 随机小字的文本的内容和颜色
+            var smalltext = randArr();
+            var smallColor = randArr();
+            for (var i = 0; i < 5; i++) {
+                smallEle[i].innerHTML = textArr[smalltext[i]];
+                smallEle[i].style.color = colorArr[smallColor[i]];
+            }
+        }
+        changeText();
+        // span标签的点击事件
+        function clickFn() {
+            for (var i = 0; i < smallEle.length; i++) {
+                smallEle[i].onclick = function () {
+                    var smallEleIndex = textArr.indexOf(this.innerHTML);
+                    if (bigEle.index == smallEleIndex) {
+                        // 选择正确 
+                        sore++;
+                        score.innerHTML = '积分:' + sore;
+                        changeText();//重新随机内容
+                        if (sore == 1) {
+                            console.log("123");
+                            var timer = setInterval(function () {
+                                if (time <= 0) {
+                                    // 游戏结束
+                                    clearInterval(timer);
+                                   mask.style.display = "block";
+                                    for (var i = 0; i < smallEle.length; i++) {
+                                        smallEle[i].onclick = null;
+                                    }
+
+                                } else {
+                                    time--;
+                                }
+                                timeEle.innerHTML = '倒计时: ' + time + 's';
+                            }, 1000)
+                        }
+                    }
+                }
+            }
+        }
+        clickFn();
+        start.onclick = function(){
+            console.log('开始成功');
+            location.reload()//重新加载页面
+        }
+        ends.onclick = function(){
+            mask.style.display = "none";
+        }
+    </script>
+</body>
+
+</html>
